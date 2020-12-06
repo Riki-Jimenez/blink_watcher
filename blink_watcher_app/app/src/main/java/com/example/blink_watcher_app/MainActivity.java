@@ -26,10 +26,15 @@ public class MainActivity extends AppCompatActivity {
     boolean flag = false;
     CameraSource cameraSource;
 
+    //final MediaPlayer mp = MediaPlayer.create(this, R.raw.wakeup_alarm);
+    //Button awake_button = (Button) findViewById(R.id.awake_button);
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //awake_button.setOnClickListener(v -> wake_alarm_stop());
 
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.CAMERA}, 1);
@@ -139,7 +144,7 @@ public class MainActivity extends AppCompatActivity {
                 break;
             default:
                 setBackgroundGrey();
-                user_message.setText("Please after permissions are granted restar the App");
+                user_message.setText("Please after permissions are granted restart the App");
         }
     }
 
@@ -185,4 +190,32 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    //set background Emergency
+    private void    setBackgroundEmergency() {
+        if(background != null){
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    background.setBackgroundColor(getResources().getColor(android.R.color.holo_orange_light));
+                }
+            });
+        }
+    }
+
+    /*/ Start Alarm
+    public void wake_alarm_start(){
+        setBackgroundEmergency();
+        user_message.setText("EMERGENCY CONDITION FOUND, PLEASE RESPOND!");
+        awake_button.setVisibility(View.VISIBLE);
+        //mp.start();
+    }
+
+    //Stop alarm
+    public void wake_alarm_stop(){
+        mp.stop();
+        awake_button.setVisibility(View.INVISIBLE);
+        init();
+    }
+
+     */
 }
