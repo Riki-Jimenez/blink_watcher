@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">blink_watcher_app</string>
+    <string name="awake_btn_text">Im Awake!!!</string>
 </resources>
