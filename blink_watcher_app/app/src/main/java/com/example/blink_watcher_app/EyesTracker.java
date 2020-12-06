@@ -28,7 +28,7 @@ public class EyesTracker extends Tracker<Face> {
     private Context context;
 
 
-    public BlinkWatcher(Context context) {
+    public EyesTracker(Context context) {
         this.context = context;
     }
     @Override
