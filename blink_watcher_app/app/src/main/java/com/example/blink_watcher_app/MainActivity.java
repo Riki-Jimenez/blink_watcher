@@ -26,15 +26,16 @@ public class MainActivity extends AppCompatActivity {
     boolean flag = false;
     CameraSource cameraSource;
 
-    //final MediaPlayer mp = MediaPlayer.create(this, R.raw.wakeup_alarm);
-    //Button awake_button = (Button) findViewById(R.id.awake_button);
+    Button awake_button;
+    MediaPlayer mp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //awake_button.setOnClickListener(v -> wake_alarm_stop());
+        awake_button = (Button) findViewById(R.id.awake_button);
+        awake_button.setOnClickListener(v -> wake_alarm_stop());
 
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.CAMERA}, 1);
@@ -48,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
         background = findViewById(R.id.background);
         user_message = findViewById(R.id.user_text);
         flag = true;
+        mp = MediaPlayer.create(this, R.raw.wakeup_alarm);
 
         initCameraSource();
     }
@@ -64,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
         cameraSource = new CameraSource.Builder(this, detector)
                 .setRequestedPreviewSize(1024, 768)
                 .setFacing(CameraSource.CAMERA_FACING_FRONT)
-                .setRequestedFps(30.0f)
+                .setRequestedFps(10.0f)
                 .build();
 
         try {
@@ -132,7 +134,7 @@ public class MainActivity extends AppCompatActivity {
         switch (condition){
             case USER_EYES_OPEN:
                 setBackgroundGreen();
-                user_message.setText("Open eyes detected yeah");
+                user_message.setText("Open eyes detected");
                 break;
             case USER_EYES_CLOSED:
                 setBackgroundOrange();
@@ -142,6 +144,11 @@ public class MainActivity extends AppCompatActivity {
                 setBackgroundRed();
                 user_message.setText("User not found");
                 break;
+            case USER_EMERGENCY:
+                setBackgroundEmergency();
+                user_message.setText("EMERGENCY CONDITION FOUND, PLEASE RESPOND!");
+                wake_alarm_start();
+
             default:
                 setBackgroundGrey();
                 user_message.setText("Please after permissions are granted restart the App");
@@ -182,7 +189,7 @@ public class MainActivity extends AppCompatActivity {
     private void setBackgroundRed() {
         if(background != null){
             runOnUiThread(new Runnable() {
-                @Override
+                    @Override
                 public void run() {
                     background.setBackgroundColor(getResources().getColor(android.R.color.holo_red_dark));
                 }
@@ -202,20 +209,19 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    /*/ Start Alarm
+    // Start Alarm
     public void wake_alarm_start(){
-        setBackgroundEmergency();
-        user_message.setText("EMERGENCY CONDITION FOUND, PLEASE RESPOND!");
         awake_button.setVisibility(View.VISIBLE);
-        //mp.start();
+        mp.start();
+        cameraSource.stop();
     }
 
     //Stop alarm
     public void wake_alarm_stop(){
         mp.stop();
         awake_button.setVisibility(View.INVISIBLE);
-        init();
+
+       init();
     }
 
-     */
 }
