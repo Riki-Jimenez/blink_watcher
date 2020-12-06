@@ -1,2 +1,11 @@
 # blink_watcher
-based on Based on: https://github.com/qureshiayaz29/Eye-Tracker-Project
+**Proyecto**
+
+**Integrantes**
+* Ricardo Jiménez Anchía
+* Laura Rincón Riveros
+
+# Documentación
+Revisar doc/Guide.rst para obtener información más detallada del proyecto.
+
+# Compilación
