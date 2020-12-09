@@ -4,9 +4,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.PowerManager;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -28,11 +30,15 @@ public class MainActivity extends AppCompatActivity {
 
     Button awake_button;
     MediaPlayer mp;
+    PowerManager.WakeLock wakeLock;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        PowerManager powerManager = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
+        wakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK, "blink_watcher:wakelock");
 
         awake_button = (Button) findViewById(R.id.awake_button);
         awake_button.setOnClickListener(v -> wake_alarm_stop());
@@ -103,6 +109,7 @@ public class MainActivity extends AppCompatActivity {
                     // for ActivityCompat#requestPermissions for more details.
                     return;
                 }
+                wakeLock.acquire();
                 cameraSource.start();
             }
             catch (IOException e) {
@@ -119,6 +126,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         setBackgroundGrey();
+        wakeLock.release();
     }
 
     @Override
@@ -127,6 +135,7 @@ public class MainActivity extends AppCompatActivity {
         if (cameraSource!=null) {
             cameraSource.release();
         }
+        wakeLock.release();
     }
 
     //update view
@@ -146,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case USER_EMERGENCY:
                 setBackgroundEmergency();
-                user_message.setText("EMERGENCY CONDITION FOUND, PLEASE RESPOND!");
+                user_message.setText("EMERGENCY CONDITION FOUND!");
                 wake_alarm_start();
 
             default:
@@ -211,8 +220,8 @@ public class MainActivity extends AppCompatActivity {
 
     // Start Alarm
     public void wake_alarm_start(){
-        awake_button.setVisibility(View.VISIBLE);
         mp.start();
+        awake_button.setVisibility(View.VISIBLE);
         cameraSource.stop();
     }
 
