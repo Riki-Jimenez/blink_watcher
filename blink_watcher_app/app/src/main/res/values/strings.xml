@@ -1,4 +1,7 @@
 <resources>
-    <string name="app_name">blink_watcher_app</string>
+    <string name="app_name">Blink Watcher</string>
     <string name="awake_btn_text">Im Awake!!!</string>
+    <string name="terminate_btn_text">Exit</string>
+    <string name="start_btn_text">Start Driving</string>
+    <string name="finish_btn_text">End Drive</string>
 </resources>

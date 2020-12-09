@@ -46,20 +46,9 @@ public class EyesTracker extends Tracker<Face> {
             BlinkCounter++;
             CloseCounter++;
             if (CloseCounter>=BLINK_LIMIT){
-                Log.i(TAG, "ALARM: WAKE UP!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                Log.i(TAG, "ALARM: WAKE UP!!!!!!!!!!!!!!!");
                 ((MainActivity)context).updateMainView(Condition.USER_EMERGENCY);
             }
-
-        }
-
-        if (Counter==AVERAGE_INTERVAL){
-            freq = (float)(BlinkCounter)/(float)(Counter);
-            if (freq>=FREQ_LIMIT){
-                Log.i(TAG, "ALARM: YOU ARE TIRED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-                ((MainActivity)context).updateMainView(Condition.USER_EMERGENCY);
-            }
-            Counter = 0;
-            BlinkCounter = 0;
 
         }
 
