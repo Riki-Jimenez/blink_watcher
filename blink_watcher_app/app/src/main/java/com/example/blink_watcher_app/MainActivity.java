@@ -1,4 +1,4 @@
-package com.example.blink_watcher_app;
+  package com.example.blink_watcher_app;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -26,10 +26,12 @@ public class MainActivity extends AppCompatActivity {
     ConstraintLayout background;
     TextView user_message;
 
-    boolean flag = false;
+    boolean Start = false;
+    boolean Alarm = false;
+
     CameraSource cameraSource;
 
-    Button awake_button, start_button, finish_button;
+    Button multi_button;
     ImageButton exit_button;
     MediaPlayer mp;
     PowerManager.WakeLock wakeLock;
@@ -39,9 +41,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        awake_button = (Button) findViewById(R.id.awake_button);
-        start_button = (Button) findViewById(R.id.start_btn);
-        finish_button = (Button) findViewById(R.id.finish_btn);
+        multi_button = (Button) findViewById(R.id.multi_btn);
+        multi_button.setText("Start Driving");
         exit_button = (ImageButton) findViewById(R.id.exit_btn);
 
         mp = MediaPlayer.create(this, R.raw.wakeup_alarm);
@@ -52,24 +53,40 @@ public class MainActivity extends AppCompatActivity {
 
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.CAMERA}, 1);
+            android.os.Process.killProcess(android.os.Process.myPid());
             Toast.makeText(this, "Permission not granted!\n Grant permission and restart app", Toast.LENGTH_SHORT).show();
         } else {
-            start_button.setOnClickListener(v -> init());
+            multi_button.setOnClickListener(v -> status());
             exit_button.setOnClickListener(v -> onDestroy());
         }
     }
 
-    private void init() {
-        finish_button.setOnClickListener(v -> finish_drive());
-        awake_button.setOnClickListener(v -> wake_alarm_stop());
-        start_button.setOnClickListener(v -> start_drive());
-        exit_button.setOnClickListener(v -> onDestroy() );
+    private void status() {
+        if(Start){
+            if(Alarm){
+                //Button pressed to stop alarm
+                stop_alarm();
+            }
+            else{
+                //Button pressed to stop driving
+                Start = false;
+                multi_button.setText("Start driving");
+                finish_drive();
+            }
+        }
+        else{
+            //Button pressed to start driving
+            Start = true;
+            multi_button.setText("Stop driving");
+            init();
 
+        }
+    }
+
+    private void init() {
         background = findViewById(R.id.background);
         user_message = findViewById(R.id.user_text);
-        flag = true;
 
-        drive_screen();
         initCameraSource();
     }
 
@@ -109,44 +126,30 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        wakeLock.acquire();
         if (cameraSource != null) {
-            try {
-                if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                    // TODO: Consider calling
-                    //    ActivityCompat#requestPermissions
-                    // here to request the missing permissions, and then overriding
-                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                    //                                          int[] grantResults)
-                    // to handle the case where the user grants the permission. See the documentation
-                    // for ActivityCompat#requestPermissions for more details.
-                    return;
-                }
-                wakeLock.acquire();
-                cameraSource.start();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            initCameraSource();
         }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        wakeLock.release();
         if (cameraSource != null) {
             cameraSource.stop();
         }
 
         setBackgroundGrey();
-        wakeLock.release();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        wakeLock.release();
         if (cameraSource != null) {
             cameraSource.release();
         }
-        wakeLock.release();
     }
 
     //update view
@@ -167,11 +170,11 @@ public class MainActivity extends AppCompatActivity {
             case USER_EMERGENCY:
                 setBackgroundEmergency();
                 user_message.setText("EMERGENCY!");
-                wake_alarm_start();
+                start_alarm();
 
             default:
                 setBackgroundGrey();
-                user_message.setText("Please  restart the App");
+                user_message.setText("Welcome to Blink Watcher");
         }
     }
 
@@ -230,73 +233,27 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // Start Alarm
-    public void wake_alarm_start() {
-    mp.start();
-    mp.setLooping(true);
-    awake_button.setVisibility(View.VISIBLE);
-/*
-    if (cameraSource != null) {
+    public void start_alarm() {
+        mp.start();
+        mp.setLooping(true);
+        Alarm = true;
+        multi_button.setText("Stop ALARM!");
         cameraSource.stop();
-    }
-*/
-    return;
+        return;
     }
 
     //Stop alarm
-    public void wake_alarm_stop() {
-    mp.pause();
-    awake_button.setVisibility(View.INVISIBLE);
-    /*
-    if (cameraSource != null) {
-        try {
-            if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
-                return;
-            }
-            cameraSource.start();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-*/
-    return;
-    }
-
-    //Start a drive
-    public void start_drive(){
-        drive_screen();
-
-        if (cameraSource != null) {
-            try {
-                if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                    // TODO: Consider calling
-                    //    ActivityCompat#requestPermissions
-                    // here to request the missing permissions, and then overriding
-                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                    //                                          int[] grantResults)
-                    // to handle the case where the user grants the permission. See the documentation
-                    // for ActivityCompat#requestPermissions for more details.
-                    return;
-                }
-                cameraSource.start();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
+    public void stop_alarm() {
+        mp.pause();
+        Alarm = false;
+        multi_button.setText("Stop driving");
+        initCameraSource();
+        return;
     }
 
     // Back to main menu
     public void finish_drive() {
-        if (cameraSource != null) {
-            cameraSource.stop();
-        }
+        cameraSource.stop();
         start_screen();
         return;
     }
@@ -304,16 +261,7 @@ public class MainActivity extends AppCompatActivity {
     //Adjust View to star menu
     public void start_screen() {
         user_message.setText("Drive Safe");
-        start_button.setVisibility(View.VISIBLE);
-        finish_button.setVisibility(View.INVISIBLE);
         setBackgroundGrey();
-        return;
-    }
-
-    //Adjust View to star menu
-    public void drive_screen() {
-        start_button.setVisibility(View.INVISIBLE);
-        finish_button.setVisibility(View.VISIBLE);
         return;
     }
 
