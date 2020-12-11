@@ -34,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
     Button multi_button;
     ImageButton exit_button;
     MediaPlayer mp;
+    PowerManager.WakeLock wakeLock;
 
 
     @Override
@@ -45,6 +46,10 @@ public class MainActivity extends AppCompatActivity {
         exit_button = (ImageButton) findViewById(R.id.exit_btn);
 
         mp = MediaPlayer.create(this, R.raw.wakeup_alarm);
+
+        PowerManager powerManager = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
+        wakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK, "blink_watcher:wakelock");
+        wakeLock.acquire();
 
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.CAMERA}, 1);
@@ -121,6 +126,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        wakeLock.acquire();
         if (cameraSource != null) {
             initCameraSource();
         }
@@ -129,6 +135,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
+        wakeLock.release();
         if (cameraSource != null) {
             cameraSource.stop();
         }
@@ -139,6 +146,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        wakeLock.release();
         if (cameraSource != null) {
             cameraSource.release();
         }
