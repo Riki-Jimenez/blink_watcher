@@ -1,11 +1,15 @@
 # blink_watcher
-**Proyecto**
+Aplicanción de Android la cual monitorea el parpadeo de los ojos de usuario en actividades como manejar, con el fin de evitar accidentes por conductores con sueño. 
+
+La idea es alertar a los usuarios cuando pase un intervalo considerable con los ojos cerrados.
 
 **Integrantes**
 * Ricardo Jiménez Anchía
 * Laura Rincón Riveros
 
-# Documentación
-Revisar doc/Guide.rst para obtener información más detallada del proyecto.
+# Compilacion
+Usar Android Studio
 
-# Compilación
+# Fuentes 
+Este proyecto utiliza Google Vision API basados en https://github.com/qureshiayaz29/Eye-Tracker-Project
+
