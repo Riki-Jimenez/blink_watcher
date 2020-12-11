@@ -1,4 +1,4 @@
-# blink_watcher
+# Blink Watcher
 Aplicanción de Android la cual monitorea el parpadeo de los ojos de usuario en actividades como manejar, con el fin de evitar accidentes por conductores con sueño. 
 
 La idea es alertar a los usuarios cuando pase un intervalo considerable con los ojos cerrados.
